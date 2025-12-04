@@ -36,10 +36,13 @@ def task_list(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     elif request.method == 'POST':
+        # Use TaskSerializer for creating (it handles the data properly)
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            task = serializer.save()
+            # Return the task with subtasks (signal will have generated them)
+            response_serializer = TaskSerializer(task)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

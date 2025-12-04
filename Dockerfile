@@ -1,21 +1,31 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instalar dependencias del sistema
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     postgresql-client \
+    build-essential \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar requirements
+# Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar código
+# Copy project
 COPY . .
 
-# Exponer puerto
+# Copy and set permissions for entrypoint script
+COPY entrypoint.sh /app/
+RUN chmod +x /app/entrypoint.sh
+
+# Expose port
 EXPOSE 8000
 
-# Script de inicio
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]

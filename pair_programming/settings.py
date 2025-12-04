@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dz68gyf5m0hv5g@pcr%@w7@h^j2u)ni6=jj_^&x_ur+#c%sx_u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', '1') == '1'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 
 # Application definition
@@ -78,8 +79,12 @@ WSGI_APPLICATION = 'pair_programming.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'prueba_tecnica_todo'),
+        'USER': os.environ.get('DB_USER', 'prueba'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'prueba'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -128,3 +133,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny'
     ]
 }
+
+# Ollama Configuration
+OLLAMA_API_URL = os.environ.get('OLLAMA_API_URL', 'http://ollama:11434')
+OLLAMA_MODEL = os.environ.get('OLLAMA_MODEL', 'llama3.2')

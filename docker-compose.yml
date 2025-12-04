@@ -30,19 +30,18 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    # Descargará el modelo Phi-3 (modelo ligero de 3.8B parámetros)
+    # Download llama3.2 model (lightweight and efficient)
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
         /bin/ollama serve &
         sleep 10
-        ollama pull phi3:mini
+        ollama pull llama3.2
         wait
 
   backend:
     build: .
     container_name: django_backend
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
@@ -54,7 +53,8 @@ services:
       - DB_PASSWORD=prueba
       - DB_HOST=db
       - DB_PORT=5432
-      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_API_URL=http://ollama:11434
+      - OLLAMA_MODEL=llama3.2
     depends_on:
       db:
         condition: service_healthy
