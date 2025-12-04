@@ -304,3 +304,14 @@ fabric.properties
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/django,intellij,visualstudiocode
+
+### Node / Frontend ###
+# Ignore Node modules in backend root (frontend has its own node_modules)
+/node_modules/
+/package-lock.json
+/package.json
+/.pnp
+.pnp.js
+
+# Frontend is managed separately
+# Frontend .gitignore handles its own files

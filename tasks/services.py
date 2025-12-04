@@ -1,21 +1,26 @@
-from langchain_ollama.llms import OllamaLLM
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from django.conf import settings
 import logging
 import json
+import os
 
 logger = logging.getLogger(__name__)
 
 class SubtaskGenerator:
     def __init__(self):
-        """Initialize the Ollama LLM for subtask generation"""
-        ollama_url = getattr(settings, 'OLLAMA_API_URL', 'http://ollama:11434')
-        ollama_model = getattr(settings, 'OLLAMA_MODEL', 'llama3.2')
-        self.llm = OllamaLLM(model=ollama_model, base_url=ollama_url)
+        """Initialize the Gemini LLM for subtask generation"""
+        api_key = getattr(settings, 'GEMINI_API_KEY', os.environ.get('GEMINI_API_KEY'))
+        model_name = getattr(settings, 'GEMINI_MODEL', 'gemini-2.5-flash')
+        self.llm = ChatGoogleGenerativeAI(
+            model=model_name,
+            google_api_key=api_key,
+            temperature=0.7
+        )
 
     def generate(self, task_title: str, task_description: str, max_subtasks: int = 5):
-        """Generate subtasks using LangChain and Ollama
+        """Generate subtasks using LangChain and Gemini
 
         Args:
             task_title: The title of the main task
@@ -63,8 +68,11 @@ Generate the necessary subtasks to complete this task. Remember to return ONLY a
 
             # Parse the JSON response
             try:
+                # Extract content from AIMessage
+                response_text = response.content if hasattr(response, 'content') else str(response)
+
                 # Clean up the response - remove markdown code blocks if present
-                cleaned_response = response.strip()
+                cleaned_response = response_text.strip()
                 if cleaned_response.startswith("```json"):
                     cleaned_response = cleaned_response.replace("```json", "").replace("```", "").strip()
                 elif cleaned_response.startswith("```"):
@@ -82,7 +90,7 @@ Generate the necessary subtasks to complete this task. Remember to return ONLY a
 
             except (json.JSONDecodeError, ValueError) as parse_error:
                 logger.error(f"Failed to parse LLM response: {parse_error}")
-                logger.error(f"Raw response: {response}")
+                logger.error(f"Raw response: {response_text if 'response_text' in locals() else response}")
                 raise
 
         except Exception as e:

@@ -134,6 +134,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-# Ollama Configuration
-OLLAMA_API_URL = os.environ.get('OLLAMA_API_URL', 'http://ollama:11434')
-OLLAMA_MODEL = os.environ.get('OLLAMA_MODEL', 'llama3.2')
+# Gemini Configuration
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyD_t6C77k_whci_qUsvEvfg0npCiczdxek')
+GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-pro')
